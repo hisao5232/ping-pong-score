@@ -31,6 +31,13 @@ export default function TableTennisScoreboard() {
   // 履歴スタック（1点戻す/キャンセル用）
   const [history, setHistory] = useState<GameHistory[]>([]);
 
+  // --- 振動フィードバック ---
+  const triggerVibration = (pattern: number | number[] = 100) => {
+    if (typeof window !== "undefined" && "vibrate" in navigator) {
+      navigator.vibrate(pattern);
+    }
+  };
+
   // --- サーブ権・タイブレーク判定ロジック ---
   const totalScore = scoreA + scoreB;
   
@@ -58,6 +65,9 @@ export default function TableTennisScoreboard() {
 
   // --- 得点処理 ---
   const handleAddPoint = (player: "A" | "B") => {
+    // 得点追加時の振動（短く1回）
+    triggerVibration(100);
+
     saveHistory();
     let nextA = scoreA;
     let nextB = scoreB;
@@ -79,6 +89,10 @@ export default function TableTennisScoreboard() {
   // --- 1点戻す（キャンセル） ---
   const handleUndo = () => {
     if (history.length === 0) return;
+
+    // 戻す時の振動（2回「トトッ」）
+    triggerVibration([50, 50, 50]);
+
     const lastState = history[history.length - 1];
     
     setScoreA(lastState.scoreA);
@@ -252,6 +266,8 @@ export default function TableTennisScoreboard() {
           <button
             onClick={() => {
               if (scoreA > 0) {
+                // 1点減算時の振動（2回「トトッ」）
+                triggerVibration([50, 50, 50]);
                 saveHistory();
                 setScoreA((prev) => prev - 1);
               }
@@ -321,6 +337,8 @@ export default function TableTennisScoreboard() {
           <button
             onClick={() => {
               if (scoreB > 0) {
+                // 1点減算時の振動（2回「トトッ」）
+                triggerVibration([50, 50, 50]);
                 saveHistory();
                 setScoreB((prev) => prev - 1);
               }
